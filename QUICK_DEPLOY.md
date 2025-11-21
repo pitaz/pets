@@ -39,6 +39,8 @@
    - Click "New" → "GitHub Repo" → Select your repo
    - Railway auto-detects it's Node.js
    - **Set Root Directory**: `backend`
+   - **Important**: Make sure the build completes successfully
+   - Check the build logs to ensure `yarn build` runs and creates `dist/main.js`
    - Railway will start building automatically
 
 5. **Set Environment Variables** (in your backend service):

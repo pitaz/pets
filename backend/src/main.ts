@@ -42,7 +42,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   await app.listen(port);
-  console.log(`🚀 Backend running on http://localhost:${port}/api`);
+  // console.log(`🚀 Backend running on ${configService.get('API_URL')}/api`);
 }
 
 bootstrap();
