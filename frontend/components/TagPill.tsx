@@ -18,7 +18,7 @@ export function TagPill({ tag, size = "md" }: TagPillProps) {
     <Link
       href={`/tags/${tag.slug}`}
       className={cn(
-        "inline-block bg-primary-100 text-primary-800 rounded-full font-medium hover:bg-primary-200 transition-colors",
+        "inline-block bg-primary-50 text-primary-700 border border-primary-200 rounded-full font-medium hover:bg-primary-100 hover:border-primary-300 transition-colors",
         sizeClasses[size]
       )}
     >

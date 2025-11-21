@@ -50,12 +50,12 @@ export function SearchBar() {
           onChange={(e) => handleSearch(e.target.value)}
           onFocus={() => query.length >= 2 && setShowSuggestions(true)}
           onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-          placeholder="Search for pets..."
-          className="w-full px-4 py-3 pr-12 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500"
+          placeholder="Search for pets by name, type, or characteristics..."
+          className="w-full px-4 py-4 pr-32 rounded-xl text-gray-900 bg-white shadow-lg focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2"
         />
         <button
           type="submit"
-          className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
+          className="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium shadow-md hover:shadow-lg"
         >
           Search
         </button>
