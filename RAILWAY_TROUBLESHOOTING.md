@@ -16,15 +16,25 @@ This error means the build step didn't run or failed. Here's how to fix it:
    - `yarn build` running
    - `dist/main.js` being created
 
-### Solution 2: Manual Build Command
+### Solution 2: Set Build Command in Railway Dashboard (IMMEDIATE FIX)
 
-If Railway isn't running the build automatically:
+**This is the fastest way to fix the issue:**
 
-1. Go to your backend service → Settings
-2. Under "Build & Deploy", check "Build Command"
-3. Set it to: `yarn install && yarn prisma generate && yarn build`
-4. Set "Start Command" to: `yarn start:prod`
-5. Redeploy
+1. Go to your Railway project → Backend service
+2. Click **Settings** tab
+3. Scroll to **"Build & Deploy"** section
+4. Set **Build Command**: `yarn install && yarn prisma generate && yarn build`
+5. Set **Start Command**: `yarn start:prod`
+6. Click **Save**
+7. Railway will automatically redeploy
+
+**OR** if the above doesn't work:
+
+1. Set **Start Command** to: `yarn start` (this will build first, then start)
+2. Click **Save**
+3. Redeploy
+
+This ensures the build runs before the app starts.
 
 ### Solution 3: Use Railway CLI
 

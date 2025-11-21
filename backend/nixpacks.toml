@@ -11,5 +11,5 @@ cmds = [
 ]
 
 [start]
-cmd = "yarn start:prod"
+cmd = "yarn start"
 
