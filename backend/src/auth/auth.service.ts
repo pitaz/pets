@@ -85,7 +85,8 @@ export class AuthService {
     const { refreshToken } = refreshTokenDto;
 
     try {
-      const payload = this.jwtService.verify(refreshToken, {
+      // Verify the refresh token is valid (throws if invalid)
+      this.jwtService.verify(refreshToken, {
         secret: this.configService.get('JWT_REFRESH_SECRET'),
       });
 
