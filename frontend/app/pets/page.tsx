@@ -1,9 +1,10 @@
 import { PetCard } from "@/components/PetCard";
 import { PetFilters } from "@/components/PetFilters";
-import { fetchPets } from "@/lib/api";
+import { fetchPets, Pet } from "@/lib/api";
 import { Pagination } from "@/components/Pagination";
 
 export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 interface SearchParams {
   page?: string;
@@ -17,12 +18,24 @@ export default async function PetsPage({
   searchParams: SearchParams;
 }) {
   const page = parseInt(searchParams.page || "1", 10);
-  const { data: pets, meta } = await fetchPets({
-    page,
-    q: searchParams.q,
-    tag: searchParams.tag,
-    limit: 20,
-  });
+
+  // Handle API errors gracefully
+  let pets: Pet[] = [];
+  let meta = { total: 0, page: 1, limit: 20, totalPages: 0 };
+
+  try {
+    const response = await fetchPets({
+      page,
+      q: searchParams.q,
+      tag: searchParams.tag,
+      limit: 20,
+    });
+    pets = response.data || [];
+    meta = response.meta || meta;
+  } catch (error) {
+    console.warn("Failed to fetch pets:", error);
+    pets = [];
+  }
 
   const hasFilters = searchParams.q || searchParams.tag;
 
@@ -36,7 +49,9 @@ export default async function PetsPage({
           </h1>
           <p className="text-lg text-gray-600">
             {hasFilters
-              ? `Found ${meta?.total || 0} pet${meta?.total !== 1 ? "s" : ""} matching your criteria`
+              ? `Found ${meta?.total || 0} pet${
+                  meta?.total !== 1 ? "s" : ""
+                } matching your criteria`
               : "Discover our comprehensive catalog of legal pets"}
           </p>
         </div>

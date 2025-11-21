@@ -1,12 +1,23 @@
 import Link from "next/link";
 import { PetCard } from "@/components/PetCard";
 import { SearchBar } from "@/components/SearchBar";
-import { fetchPets } from "@/lib/api";
+import { fetchPets, Pet } from "@/lib/api";
 
 export const revalidate = 60; // Revalidate every 60 seconds
+export const dynamic = "force-dynamic"; // Prevent static generation issues during build
 
 export default async function HomePage() {
-  const { data: pets } = await fetchPets({ limit: 12 });
+  // Handle API errors gracefully during build/deployment
+  let pets: Pet[] = [];
+  try {
+    const response = await fetchPets({ limit: 12 });
+    pets = response.data || [];
+  } catch (error) {
+    // During build time, API might not be available
+    // This is okay - the page will still render and fetch data client-side if needed
+    console.warn("Failed to fetch pets during build:", error);
+    pets = [];
+  }
 
   return (
     <>
@@ -14,9 +25,12 @@ export default async function HomePage() {
       <section className="relative bg-gradient-to-br from-primary-500 via-primary-600 to-primary-700 text-white py-20 md:py-28 overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          }}></div>
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            }}
+          ></div>
         </div>
 
         <div className="container-custom relative z-10">
@@ -100,8 +114,8 @@ export default async function HomePage() {
                 Comprehensive Guides
               </h3>
               <p className="text-gray-600">
-                Detailed information about pet care, diet, and legal requirements
-                to help you make informed decisions.
+                Detailed information about pet care, diet, and legal
+                requirements to help you make informed decisions.
               </p>
             </div>
             <div className="text-center p-6">

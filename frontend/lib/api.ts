@@ -85,8 +85,24 @@ export async function fetchPets(params?: {
   tag?: string;
   status?: string;
 }): Promise<PaginatedResponse<Pet>> {
-  const response = await api.get("/pets", { params });
-  return response.data;
+  try {
+    const response = await api.get("/pets", { params });
+    return response.data;
+  } catch (error) {
+    // Return empty response if API is unavailable (e.g., during build)
+    if (axios.isAxiosError(error) && error.code === "ECONNREFUSED") {
+      return {
+        data: [],
+        meta: {
+          total: 0,
+          page: 1,
+          limit: params?.limit || 20,
+          totalPages: 0,
+        },
+      };
+    }
+    throw error;
+  }
 }
 
 export async function fetchPetBySlug(slug: string): Promise<Pet | null> {

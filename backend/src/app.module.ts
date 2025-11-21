@@ -10,8 +10,10 @@ import { TagsModule } from './tags/tags.module';
 import { AdminModule } from './admin/admin.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { SearchModule } from './search/search.module';
+import { HealthController } from './health/health.controller';
 
 @Module({
+  controllers: [HealthController],
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
@@ -35,4 +37,3 @@ import { SearchModule } from './search/search.module';
   ],
 })
 export class AppModule {}
-

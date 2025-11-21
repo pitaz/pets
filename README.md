@@ -200,26 +200,41 @@ yarn prisma:studio
 
 ## Deployment
 
-### Backend
+### Quick Start
 
-The backend can be deployed to:
+See **[QUICK_DEPLOY.md](./QUICK_DEPLOY.md)** for a step-by-step deployment guide (15 minutes).
 
-- Render
-- DigitalOcean App Platform
-- Railway
-- Self-hosted (Docker)
+### Detailed Guide
 
-Set environment variables in your hosting platform.
+See **[DEPLOYMENT.md](./DEPLOYMENT.md)** for comprehensive deployment instructions.
 
-### Frontend
+### Recommended Setup (Free Tier)
 
-The frontend can be deployed to:
+- **Frontend**: [Vercel](https://vercel.com) - Free forever
+- **Backend**: [Railway](https://railway.app) - $5 free credit/month
+- **Database**: Railway PostgreSQL (included)
 
-- Vercel (recommended)
-- Netlify
-- Any Node.js hosting
+**Total Cost: $0/month**
 
-Set `NEXT_PUBLIC_API_URL` to your backend API URL.
+### Quick Deploy Steps
+
+1. **Frontend (Vercel)**:
+
+   - Push code to GitHub
+   - Import repo to Vercel
+   - Set root directory to `frontend`
+   - Deploy
+
+2. **Backend (Railway)**:
+
+   - Create Railway project from GitHub
+   - Add PostgreSQL database
+   - Deploy backend service (root: `backend`)
+   - Set environment variables
+   - Run migrations: `railway run yarn prisma migrate deploy`
+
+3. **Connect**:
+   - Set `NEXT_PUBLIC_API_URL` in Vercel to your Railway backend URL + `/api`
 
 ## License
 

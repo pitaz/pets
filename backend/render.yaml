@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: legal-pets-backend
+    env: node
+    buildCommand: yarn install && yarn prisma:generate && yarn build
+    startCommand: yarn start:prod
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+    healthCheckPath: /api/health
