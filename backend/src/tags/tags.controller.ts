@@ -15,4 +15,3 @@ export class TagsController {
     return this.tagsService.findOne(slug);
   }
 }
-
