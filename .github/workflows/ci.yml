@@ -1,0 +1,104 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  backend:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: legal_pets_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "yarn"
+          cache-dependency-path: backend/yarn.lock
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: yarn install --frozen-lockfile
+
+      - name: Generate Prisma Client
+        working-directory: ./backend
+        run: yarn prisma generate
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/legal_pets_test?schema=public
+
+      - name: Run migrations
+        working-directory: ./backend
+        run: yarn prisma migrate deploy
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/legal_pets_test?schema=public
+
+      - name: Lint
+        working-directory: ./backend
+        run: yarn lint
+
+      - name: Type check
+        working-directory: ./backend
+        run: yarn tsc --noEmit
+
+      - name: Test
+        working-directory: ./backend
+        run: yarn test
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/legal_pets_test?schema=public
+          JWT_SECRET: test-secret
+          JWT_REFRESH_SECRET: test-refresh-secret
+
+      - name: Build
+        working-directory: ./backend
+        run: yarn build
+
+  frontend:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "yarn"
+          cache-dependency-path: frontend/yarn.lock
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: yarn install --frozen-lockfile
+
+      - name: Lint
+        working-directory: ./frontend
+        run: yarn lint
+
+      - name: Type check
+        working-directory: ./frontend
+        run: yarn type-check
+
+      - name: Build
+        working-directory: ./frontend
+        run: yarn build
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:3001/api

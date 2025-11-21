@@ -1,0 +1,169 @@
+// prisma/schema.prisma
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id            String     @id @default(uuid())
+    email         String     @unique
+    passwordHash  String?
+    role          UserRole   @default(USER)
+    name          String?
+    createdAt     DateTime   @default(now())
+    updatedAt     DateTime   @updatedAt
+    bookmarks     Bookmark[]
+    comments      Comment[]
+    refreshTokens Token[]
+    auditLogs     AuditLog[]
+}
+
+model Token {
+    id        String   @id @default(uuid())
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId    String
+    token     String   @unique
+    expiresAt DateTime
+    createdAt DateTime @default(now())
+
+    @@index([token])
+    @@index([userId])
+}
+
+enum UserRole {
+    USER
+    EDITOR
+    ADMIN
+}
+
+model Pet {
+    id              String              @id @default(uuid())
+    slug            String              @unique
+    commonName      String
+    scientificName  String?
+    shortIntro      String?
+    description     Json? // structured content or markdown
+    background      String?             @db.Text
+    history         String?             @db.Text
+    diet            String?             @db.Text
+    ownershipGuide  String?             @db.Text
+    classifications PetClassification[]
+    media           Media[]
+    tags            Tag[]               @relation("PetTags")
+    comments        Comment[]
+    bookmarks       Bookmark[]
+    status          PetStatus           @default(PUBLISHED)
+    publishedAt     DateTime?
+    createdAt       DateTime            @default(now())
+    updatedAt       DateTime            @updatedAt
+    searchVector    String?             @db.Text // for full-text search
+
+    @@index([slug])
+    @@index([status])
+    @@index([publishedAt])
+}
+
+enum PetStatus {
+    DRAFT
+    PUBLISHED
+    ARCHIVED
+}
+
+model PetClassification {
+    id    String @id @default(uuid())
+    pet   Pet    @relation(fields: [petId], references: [id], onDelete: Cascade)
+    petId String
+    type  String // e.g., "Species", "Breed", "LegalStatus"
+    value String
+
+    @@index([petId])
+    @@index([type, value])
+}
+
+model Media {
+    id        String    @id @default(uuid())
+    pet       Pet?      @relation(fields: [petId], references: [id], onDelete: Cascade)
+    petId     String?
+    url       String
+    type      MediaType
+    altText   String?
+    width     Int?
+    height    Int?
+    mimeType  String?
+    size      Int? // file size in bytes
+    createdAt DateTime  @default(now())
+
+    @@index([petId])
+}
+
+enum MediaType {
+    IMAGE
+    VIDEO
+    DOCUMENT
+}
+
+model Tag {
+    id   String @id @default(uuid())
+    name String @unique
+    slug String @unique
+    pets Pet[]  @relation("PetTags")
+
+    @@index([slug])
+}
+
+model Comment {
+    id        String        @id @default(uuid())
+    user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId    String
+    pet       Pet           @relation(fields: [petId], references: [id], onDelete: Cascade)
+    petId     String
+    content   String        @db.Text
+    status    CommentStatus @default(PENDING)
+    createdAt DateTime      @default(now())
+    updatedAt DateTime      @updatedAt
+
+    @@index([petId])
+    @@index([userId])
+    @@index([status])
+}
+
+enum CommentStatus {
+    PENDING
+    APPROVED
+    REJECTED
+}
+
+model Bookmark {
+    id        String   @id @default(uuid())
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId    String
+    pet       Pet      @relation(fields: [petId], references: [id], onDelete: Cascade)
+    petId     String
+    createdAt DateTime @default(now())
+
+    @@unique([userId, petId])
+    @@index([userId])
+    @@index([petId])
+}
+
+model AuditLog {
+    id         String   @id @default(uuid())
+    user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+    userId     String?
+    action     String // e.g., "CREATE_PET", "UPDATE_PET", "DELETE_PET"
+    resource   String // e.g., "Pet", "User"
+    resourceId String?
+    metadata   Json?
+    ipAddress  String?
+    userAgent  String?
+    createdAt  DateTime @default(now())
+
+    @@index([userId])
+    @@index([action])
+    @@index([resource, resourceId])
+    @@index([createdAt])
+}
