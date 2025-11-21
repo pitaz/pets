@@ -11,5 +11,5 @@ cmds = [
 ]
 
 [start]
-cmd = "yarn start"
+cmd = "yarn start:with-deploy"
 
